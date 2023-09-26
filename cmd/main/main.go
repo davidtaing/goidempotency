@@ -11,8 +11,10 @@ import (
 
 func main() {
 	r := mux.NewRouter()
-	r.Handle("/hello", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(helloWorld)))
-	http.Handle("/", r)
+	r.HandleFunc("/hello", helloWorld)
+	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
+
+	http.Handle("/", loggedRouter)
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
