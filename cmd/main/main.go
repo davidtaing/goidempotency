@@ -3,20 +3,24 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello World")
-	})
-
+	r.Handle("/hello", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(helloWorld)))
 	http.Handle("/", r)
-	err := http.ListenAndServe(":8080", nil)
 
+	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		panic(err)
 	}
+}
+
+func helloWorld(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Hello World")
 }
